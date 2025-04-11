@@ -1,6 +1,5 @@
 # GRaLE Gravitational-wave Lensing Explorer
 This package investigates whether gravitational wave events, such as GW170817 may have been gravitationally lensed by a foreground galaxy, by computing lensing-related quantities.
-Absolutely! Here’s the full `README.md` content ready to copy and paste into your GitHub repo:
 
 ---
 

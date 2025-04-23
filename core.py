@@ -88,12 +88,6 @@ class GWEvent:
         }
 
 
-event = GWEvent(m1=1.1, m2=1.6, M0=1.186)
-results = event.redshift_range(z_lens=0.0098)
-
-z_source_array = results["plausible_redshifts_lensed"]
-
-    
 
 class LensingCalculator:
     def __init__(self, cosmo, D_mu1, sigma, theta_offset):

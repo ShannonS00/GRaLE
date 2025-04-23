@@ -4,6 +4,8 @@ from astropy.cosmology import z_at_value
 
 class GWEvent:
     def __init__(self, m1, m2, M0):
+        if m1 <= 0 or m2 <= 0 or M0 <= 0:
+            raise ValueError("Masses and observed chirp mass must be positive.")
         self.m1 = m1
         self.m2 = m2
         self.M0 = M0
@@ -18,6 +20,8 @@ class GWEvent:
 
 class LensingCalculator:
     def __init__(self, cosmo, D_mu1, sigma, theta_offset):
+        if D_mu1 <= 0 * u.Mpc or sigma <= 0 or theta_offset <= 0:
+            raise ValueError("D_mu1, sigma, and theta_offset must be positive.")
         self.cosmo = cosmo
         self.D_mu1 = D_mu1
         self.sigma = sigma
@@ -40,6 +44,8 @@ class LensingCalculator:
         return (self.comoving_distance(z_source) - self.comoving_distance(z_lens)) / (1 + z_source)
 
     def magnification(self, D_true):
+        if D_true <= 0 * u.Mpc:
+            raise ValueError("True distance must be positive.")
         return (D_true / self.D_mu1)**2
 
     def einstein_radius(self, DLS, DS):
@@ -49,6 +55,8 @@ class LensingCalculator:
 
     def magnifying_power(self, einstein_radius):
         theta = self.theta_offset * u.arcsec
+        if np.isclose(theta.value, einstein_radius.value):
+            raise ValueError("Attention: unphysical lensing scenario (infinite magnification).")
         return theta / (theta - einstein_radius)
 
     def reverse_calc(self, magn_range):

@@ -26,7 +26,6 @@ Gravitational wave signals, such as GW170817, may have been affected by gravitat
 - Estimate magnification from true and observed distance
 - Compute Einstein radius from lens parameters
 - Estimate magnifying power of a galaxy
-- Analyze GRB in the E_peak–E_iso plane under lensing assumptions
 - Provide visualizations for key lensing diagnostics
 
 ---

@@ -50,3 +50,12 @@ class LensingCalculator:
     def magnifying_power(self, einstein_radius):
         theta = self.theta_offset * u.arcsec
         return theta / (theta - einstein_radius)
+
+    def reverse_calc(self, magn_range):
+        """
+        Given a range of magnifications, compute the redshift values that would 
+        correspond to those magnifications assuming observed D_mu1.
+        """
+        reverse_distances = self.D_mu1 * np.sqrt(magn_range)
+        reverse_redshifts = [z_at_value(self.cosmo.luminosity_distance, d) for d in reverse_distances]
+        return reverse_redshifts, reverse_distances

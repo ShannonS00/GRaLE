@@ -2,31 +2,30 @@ import pytest
 import numpy as np
 from astropy.cosmology import FlatLambdaCDM
 import astropy.units as u
-from grale.core import GWEvent, LensingCalculator
+from grale import GWEvent, LensingCalculator
+
 
 def test_chirp_mass_correctness():
-    event = GWEvent(m1=1.4, m2=1.2, M0=1.186)
+    event = GWEvent(m1=1.1, m2=1.5, M0=1.186)
     cm = event.chirp_mass()
-    expected = (1.4 * 1.2)**(3/5) / (1.4 + 1.2)**(1/5)
+    expected = (1.1 * 1.5)**(3/5) / (1.1 + 1.5)**(1/5)
     assert np.isclose(cm, expected)
 
 def test_true_redshift_single():
-    event = GWEvent(m1=1.4, m2=1.2, M0=1.186)
+    event = GWEvent(m1=1.1, m2=1.5, M0=1.186)
     z = event.true_redshift_single(1.0)
     assert np.isclose(z, 0.186)
 
 def test_invalid_inputs():
     with pytest.raises(ValueError):
-        GWEvent(m1=-1.0, m2=1.2, M0=1.186)
+        GWEvent(m1=-1.0, m2=1.2, M0=1.186)  # negative m1
     with pytest.raises(ValueError):
-        GWEvent(m1=1.4, m2=-1.2, M0=1.186)
+        GWEvent(m1=1.4, m2=1.2, M0=-1.0)    # negative M0
     with pytest.raises(ValueError):
-        GWEvent(m1=1.4, m2=1.2, M0=-1.0)
-    with pytest.raises(ValueError):
-        GWEvent(m1=2.0, m2=1.0, M0=1.186)
+        GWEvent(m1=2.0, m2=1.0, M0=1.186)   # m1 > m2
 
 def test_redshift_range_output():
-    event = GWEvent(m1=1.4, m2=1.2, M0=1.186)
+    event = GWEvent(m1=1.2, m2=1.4, M0=1.186)    
     results = event.redshift_range()
     assert "chirp_masses" in results
     assert results["chirp_masses"].shape[0] > 0

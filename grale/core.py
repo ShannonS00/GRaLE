@@ -4,6 +4,16 @@ from astropy.cosmology import z_at_value
 
 class GWEvent:
     def __init__(self, m1, m2):
+        """
+        Initialize a gravitational wave event with component masses m1 and m2.
+
+        Parameters:
+            m1 (float): Mass of the lighter compact object (must be > 0).
+            m2 (float): Mass of the heavier compact object (must be > 0 and m2 ≥ m1).
+
+        Raises:
+            ValueError: If masses are non-positive or if m1 > m2.
+        """
         if m1 <= 0 or m2 <= 0:
             raise ValueError("Masses must be positive.")
         if m1 > m2:
@@ -13,7 +23,18 @@ class GWEvent:
 
     def chirp_mass(self, m1=None, m2=None):
         """
-        Calculate chirp mass for given m1 and m2 (or use self.m1 and self.m2).
+        Calculate the chirp mass M₀ = (m₁ * m₂)^{3/5} / (m₁ + m₂)^{1/5}, 
+        which determines the amplitude and frequency evolution of a GW signal.
+
+        Parameters:
+            m1 (float, optional): First mass. Defaults to self.m1.
+            m2 (float, optional): Second mass. Defaults to self.m2.
+
+        Returns:
+            float: Chirp mass value.
+
+        Notes:
+            The chirp mass is stored in self.M0 as a side effect.
         """
         m1 = m1 if m1 is not None else self.m1
         m2 = m2 if m2 is not None else self.m2
@@ -22,7 +43,14 @@ class GWEvent:
     
     def true_redshift(self, M):
         """
-        Calculate redshift for a single chirp mass value.
+        Compute the true redshift of a gravitational wave source,
+        given the observed (redshifted) chirp mass and the intrinsic chirp mass.
+
+        Parameters:
+            M (float): Observed redshifted chirp mass.
+
+        Returns:
+            float: Estimated redshift (z = M₀ / M - 1).
         """
         return (self.M0 / M) - 1
 
@@ -34,12 +62,23 @@ class GWEvent:
                        m2_range=None, 
                        z_lens=None):
         """
-        Compute a grid of redshifts over m1/m2 combinations.
-        
-        You can:
-        - Specify m1_range and m2_range manually (numpy arrays)
-        - OR vary around self.m1/self.m2 ± delta with custom step
-        - Optionally provide z_lens to filter lensed scenarios
+        Compute a grid of chirp masses and their corresponding redshifts over a 
+        parameter space of m1 and m2. Optionally apply a redshift threshold to model lensing.
+
+        Parameters:
+            delta (float): Variation range ± around self.m1 and self.m2 if no ranges provided.
+            step (float): Step size for mass grid.
+            m1_range (np.ndarray, optional): Custom range of m1 values.
+            m2_range (np.ndarray, optional): Custom range of m2 values.
+            z_lens (float, optional): Minimum redshift to qualify as lensed.
+
+        Returns:
+            dict: Contains mass ranges, chirp mass grid, redshift grid, and filters:
+                - 'm1_range', 'm2_range'
+                - 'chirp_masses'
+                - 'redshifts'
+                - 'plausible_redshifts' (z ≥ 0)
+                - 'plausible_redshifts_lensed' (z ≥ z_lens, if given)
         """
         # If no mass ranges are given, construct them from delta and step
         if m1_range is None:
@@ -84,6 +123,18 @@ class GWEvent:
 
 class LensingCalculator:
     def __init__(self, cosmo, D_mu1, sigma, theta_offset):
+        """
+        Initialize lensing calculator with observational and lens model parameters.
+
+        Parameters:
+            cosmo (Cosmology): Astropy cosmology instance.
+            D_mu1 (Quantity): Observed luminosity distance (with units).
+            sigma (float): Velocity dispersion of lens (in km/s).
+            theta_offset (float): Angular offset between image and lens center (in arcseconds).
+
+        Raises:
+            ValueError: If any parameter is non-positive.
+        """
         if D_mu1 <= 0 * u.Mpc or sigma <= 0 or theta_offset <= 0:
             raise ValueError("D_mu1, sigma, and theta_offset must be positive.")
         self.cosmo = cosmo
@@ -93,21 +144,46 @@ class LensingCalculator:
         self.c = 3e5  # speed of light in km/s
 
     def luminosity_distance(self, z):
+        """Return luminosity distance (with units) for a given redshift z."""
+
         return self.cosmo.luminosity_distance(z)
 
     def comoving_distance(self, z):
+        """Return comoving distance (with units) for a given redshift z."""
+
         return self.cosmo.comoving_distance(z)
 
     def angular_diameter_distance(self, z):
+        """Return angular diameter distance (with units) for a given redshift z."""
         return self.cosmo.angular_diameter_distance(z)
 
     def angular_diameter_distance_z1z2(self, z1, z2):
+        """Return angular diameter distance between redshift z1 and z2."""
         return self.cosmo.angular_diameter_distance_z1z2(z1, z2)
 
     def comoving_distance_diff(self, z_source, z_lens):
+        """
+        Compute (D_C(z_source) - D_C(z_lens)) / (1 + z_source).
+
+        Parameters:
+            z_source (float): Source redshift.
+            z_lens (float): Lens redshift.
+
+        Returns:
+            Quantity: Distance value in Mpc.
+        """
         return (self.comoving_distance(z_source) - self.comoving_distance(z_lens)) / (1 + z_source)
 
     def magnification(self, D_true):
+        """
+        Compute lensing magnification μ = (D_true / D_mu1)^2.
+
+        Parameters:
+            D_true (Quantity): True luminosity distance (must be positive).
+
+        Returns:
+            float: Lensing magnification factor.
+        """
         if D_true <= 0 * u.Mpc:
             raise ValueError("True distance must be positive.")
         return (D_true / self.D_mu1)**2
@@ -115,7 +191,13 @@ class LensingCalculator:
     def einstein_radius(self, DLS, DS):
         """
         Compute Einstein radius in arcseconds.
-        DLS and DS must be Quantities with units (e.g., Mpc).
+
+        Parameters:
+            DLS (Quantity): Angular diameter distance between lens and source.
+            DS (Quantity): Angular diameter distance to source.
+
+        Returns:
+            Quantity: Einstein radius in arcseconds.
         """
         rE_rad = 4 * np.pi * (self.sigma / self.c)**2 * (DLS / DS)  # dimensionless
         rE = (rE_rad * u.rad).to(u.arcsec)  # manually add rad unit, then convert
@@ -123,6 +205,18 @@ class LensingCalculator:
 
 
     def magnifying_power(self, einstein_radius):
+        """
+        Compute geometric magnification μ_geo = θ / (θ - θ_E).
+
+        Parameters:
+            einstein_radius (Quantity): Einstein radius in arcseconds.
+
+        Returns:
+            float: Geometric magnification factor.
+
+        Raises:
+            ValueError: If θ ≈ θ_E (unphysical case of infinite magnification).
+        """
         theta = self.theta_offset * u.arcsec
         if np.isclose(theta.value, einstein_radius.value):
             raise ValueError("Attention: unphysical lensing scenario (infinite magnification).")
@@ -130,16 +224,16 @@ class LensingCalculator:
 
     def compute_over_redshift_range(self, z_array, z_lens):
         """
-        Compute DS, DLS, Einstein radius, and magnifying power over redshift array.
+        Compute lensing quantities (D_S, D_LS, θ_E, μ_geo) over a source redshift array.
 
         Parameters:
-            z_array: array-like of source redshifts
-            z_lens: float, redshift of the lens
-            return_summary: if True, also returns a string summary for printing
+            z_array (array-like): Source redshift values.
+            z_lens (float): Lens redshift.
 
         Returns:
-            results: dict of lensing quantities
-            summary (optional): string with ranges
+            dict: Computed lensing properties for each redshift:
+                - 'z', 'DS', 'DLS', 'r_E', 'mu_geo'
+                - 'plausible_magnifications': μ_geo for z ≥ z_lens
         """
         DS = np.array([self.angular_diameter_distance(z).value for z in z_array])
         DLS = np.array([self.angular_diameter_distance_z1z2(z_lens, z).value for z in z_array])
@@ -172,18 +266,16 @@ class LensingCalculator:
     
     def reverse_calc(self, magn_range):
         """
-        Given a range of magnifications, compute the redshift values and 
-        corresponding true luminosity distances assuming observed D_mu1.
-
-        Always returns a summary string describing the result ranges.
+        Estimate the redshifts and true luminosity distances corresponding to a 
+        given range of magnifications, assuming the observed distance is D_mu1.
 
         Parameters:
-            magn_range: array-like of magnification values (μ)
+            magn_range (array-like): Array of magnification values μ > 0.
 
         Returns:
-            redshifts: list of redshifts
-            distances: list of luminosity distances
-            summary: formatted string with min/max of inputs and outputs
+            tuple:
+                - reverse_redshifts (list): Redshifts corresponding to true distances.
+                - reverse_distances (list): True luminosity distances.
         """
         reverse_distances = self.D_mu1 * np.sqrt(magn_range)
         reverse_redshifts = [z_at_value(self.cosmo.luminosity_distance, d) for d in reverse_distances]

@@ -3,14 +3,13 @@ from astropy import units as u
 from astropy.cosmology import z_at_value
 
 class GWEvent:
-    def __init__(self, m1, m2, M0):
-        if m1 <= 0 or m2 <= 0 or M0 <= 0:
-            raise ValueError("Masses and observed chirp mass must be positive.")
+    def __init__(self, m1, m2):
+        if m1 <= 0 or m2 <= 0:
+            raise ValueError("Masses must be positive.")
         if m1 > m2:
-            raise ValueError("m1 must be smaller or equal than m2 (m1 < m2).")
+            raise ValueError("m1 must be smaller or equal to m2 (m1 ≤ m2).")
         self.m1 = m1
         self.m2 = m2
-        self.M0 = M0
 
     def chirp_mass(self, m1=None, m2=None):
         """
@@ -18,21 +17,15 @@ class GWEvent:
         """
         m1 = m1 if m1 is not None else self.m1
         m2 = m2 if m2 is not None else self.m2
+        self.M0 = (m1 * m2)**(3/5) / (m1 + m2)**(1/5)
         return (m1 * m2)**(3/5) / (m1 + m2)**(1/5)
     
-    def true_redshift_single(self, M):
+    def true_redshift(self, M):
         """
         Calculate redshift for a single chirp mass value.
         """
         return (self.M0 / M) - 1
 
-    
-    def true_redshift(self):
-        """
-        Calculate true redshift from the default chirp mass.
-        """
-        M_true = self.chirp_mass()
-        return self.true_redshift_single(M_true)
     
     def redshift_range(self, 
                        delta=0.4, 
@@ -60,7 +53,7 @@ class GWEvent:
             for m2 in m2_range
         ])
         redshifts = np.array([
-            [self.true_redshift_single(M) for M in row]
+            [self.true_redshift(M) for M in row]
             for row in chirp_masses
         ])
 
@@ -135,7 +128,7 @@ class LensingCalculator:
             raise ValueError("Attention: unphysical lensing scenario (infinite magnification).")
         return (theta / (theta - einstein_radius)).decompose().value
 
-    def compute_over_redshift_range(self, z_array, z_lens, return_summary=True):
+    def compute_over_redshift_range(self, z_array, z_lens):
         """
         Compute DS, DLS, Einstein radius, and magnifying power over redshift array.
 
@@ -156,29 +149,25 @@ class LensingCalculator:
         ])
         mu_geo = np.array([self.magnifying_power(re * u.arcsec) for re in r_E])
 
-        z_min, z_max = np.min(z_array), np.max(z_array)
-        DS_min, DS_max = np.min(DS), np.max(DS)
-        DLS_min, DLS_max = np.min(DLS), np.max(DLS)
-        rE_min, rE_max = np.min(r_E), np.max(r_E)
-        mu_min, mu_max = np.min(mu_geo), np.max(mu_geo)
+        # Redshift filters
+        plausible_z = z_array[z_array >= z_lens] if z_lens is not None else z_array
+        plausible_mu = mu_geo[z_array >= z_lens] if z_lens is not None else mu_geo
+      
+        # Info output (matching redshift_range style)
+        print(f"z ∈ [{z_array.min():.4f}, {z_array.max():.4f}]")
+        print(f"DS range: [{DS.min():.2f}, {DS.max():.2f}] Mpc")
+        print(f"DLS range: [{DLS.min():.2f}, {DLS.max():.2f}] Mpc")
+        print(f"Einstein radius range: [{r_E.min():.3f}, {r_E.max():.3f}] arcsec")
+        print(f"Magnification range: [{mu_geo.min():.2f}, {mu_geo.max():.2f}]")
 
-        summary = (
-            f"Lensed redshift range (z ≥ {z_lens}): [{z_min:.4f}, {z_max:.4f}]\n"
-            f"DS range: [{DS_min:.2f}, {DS_max:.2f}] Mpc\n"
-            f"DLS range: [{DLS_min:.2f}, {DLS_max:.2f}] Mpc\n"
-            f"Einstein radius range: [{rE_min:.3f}, {rE_max:.3f}] arcsec\n"
-            f"Magnification range: [{mu_min:.2f}, {mu_max:.2f}]"
-        )
-
-        results = {
+        return {
             "z": z_array,
             "DS": DS,
             "DLS": DLS,
             "r_E": r_E,
-            "mu_geo": mu_geo
+            "mu_geo": mu_geo,
+            "plausible_magnifications": plausible_mu
         }
-
-        return (results, summary) if return_summary else results
 
     
     def reverse_calc(self, magn_range):
@@ -203,11 +192,11 @@ class LensingCalculator:
         z_min, z_max = np.min(reverse_redshifts), np.max(reverse_redshifts)
         d_min, d_max = np.min(reverse_distances).value, np.max(reverse_distances).value
 
-        summary = (
-            f"Magnification range: [{mu_min:.2f}, {mu_max:.2f}]\n"
-            f"Reverse calc redshift range: [{z_min:.4f}, {z_max:.4f}]\n"
-            f"Reverse calc distance range: [{d_min:.2f}, {d_max:.2f}] Mpc"
-        )
+        # Info output 
+        print(f"Magnification range: [{mu_min:.2f}, {mu_max:.2f}]")
+        print(f"Reverse calc redshift range: [{z_min:.4f}, {z_max:.4f}]")
+        print(f"Reverse calc distance range: [{d_min:.2f}, {d_max:.2f}] Mpc")
 
-        return reverse_redshifts, reverse_distances, summary
+        return reverse_redshifts, reverse_distances
+    
     

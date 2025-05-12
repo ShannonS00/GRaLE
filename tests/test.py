@@ -6,26 +6,28 @@ from grale import GWEvent, LensingCalculator
 
 
 def test_chirp_mass_correctness():
-    event = GWEvent(m1=1.1, m2=1.5, M0=1.186)
+    event = GWEvent(m1=1.1, m2=1.5)
     cm = event.chirp_mass()
     expected = (1.1 * 1.5)**(3/5) / (1.1 + 1.5)**(1/5)
     assert np.isclose(cm, expected)
 
-def test_true_redshift_single():
-    event = GWEvent(m1=1.1, m2=1.5, M0=1.186)
-    z = event.true_redshift_single(1.0)
-    assert np.isclose(z, 0.186)
+def test_true_redshift():
+    event = GWEvent(m1=1.1, m2=1.5)
+    event.chirp_mass()
+    z = event.true_redshift(1.0)
+    expeted = (event.M0 / 1.0) - 1
+    assert np.isclose(z, expeted)
 
 def test_invalid_inputs():
     with pytest.raises(ValueError):
-        GWEvent(m1=-1.0, m2=1.2, M0=1.186)  # negative m1
+        GWEvent(m1=-1.0, m2=1.2)  # negative m1
     with pytest.raises(ValueError):
-        GWEvent(m1=1.4, m2=1.2, M0=-1.0)    # negative M0
+        GWEvent(m1=1.4, m2=1.2)    # negative M0
     with pytest.raises(ValueError):
-        GWEvent(m1=2.0, m2=1.0, M0=1.186)   # m1 > m2
+        GWEvent(m1=2.0, m2=1.0)   # m1 > m2
 
 def test_redshift_range_output():
-    event = GWEvent(m1=1.2, m2=1.4, M0=1.186)    
+    event = GWEvent(m1=1.2, m2=1.4)    
     results = event.redshift_range()
     assert "chirp_masses" in results
     assert results["chirp_masses"].shape[0] > 0
@@ -49,14 +51,12 @@ def test_compute_over_redshift_range_structure():
     cosmo = FlatLambdaCDM(H0=67.9, Om0=0.3065)
     lens = LensingCalculator(cosmo, D_mu1=40 * u.Mpc, sigma=160, theta_offset=10.07)
     z_array = np.linspace(0.01, 0.1, 5)
-    results, summary = lens.compute_over_redshift_range(z_array, z_lens=0.0098)
+    results = lens.compute_over_redshift_range(z_array, z_lens=0.0098)
     assert "mu_geo" in results
-    assert isinstance(summary, str)
 
 def test_reverse_calc_output_format():
     cosmo = FlatLambdaCDM(H0=67.9, Om0=0.3065)
     lens = LensingCalculator(cosmo, D_mu1=40 * u.Mpc, sigma=160, theta_offset=10.07)
     magn_range = np.linspace(1.0, 10.0, 5)
-    z, D, summary = lens.reverse_calc(magn_range)
+    z, D = lens.reverse_calc(magn_range)
     assert len(z) == len(D)
-    assert isinstance(summary, str)

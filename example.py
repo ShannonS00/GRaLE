@@ -10,13 +10,22 @@ z_lens = 0.0098
 distance_mu1 = 40 * u.Mpc
 
 # STEP 1: Create GWEvent with one m1, m2 pair (required)
-event = GWEvent(m1=1.1, m2=2.3, M0=1.186)
+event = GWEvent(m1=1.1, m2=1.5)
+
+# Calculate chirp mass
+chirp_mass = event.chirp_mass()
+print(f"Chirp Mass: {chirp_mass:.3f} M_sun")
+
+# Get M0 :
+event.M0 
+
 
 # Get redshift results over those mass ranges 
 # Delta is the mass difference 
 redshift_results = event.redshift_range(delta=0.5, step=0.01, z_lens=z_lens) 
 
-z_lensed = redshift_results["plausible_redshifts_lensed"]
+z_lensed = redshift_results["plausible_redshifts_lensed"] #get an array of redshifts for later use 
+
 
 # STEP 2: Compute lensing quantities
 
@@ -27,32 +36,15 @@ lens = LensingCalculator(
     theta_offset=10.07
 )
 
-lens_results, lens_summary = lens.compute_over_redshift_range(z_lensed, z_lens=z_lens)
+lens_results = lens.compute_over_redshift_range(z_lensed, z_lens=z_lens)
 
 # STEP 3: Reverse-calculate redshift range from magnification
 
 mu_geo = lens_results["mu_geo"]
 magn_range = np.linspace(mu_geo.min(), mu_geo.max(), 100)
 
-reverse_z, reverse_D, reverse_summary = lens.reverse_calc(magn_range)
+reverse_redshifts, reverse_distances = lens.reverse_calc(magn_range)
 
-
-# Print Result summaries
-
-print("=== LENSING RESULTS ===")
-print(lens_summary)
-
-print("\n=== REVERSE CALCULATION RESULTS ===")
-print(reverse_summary)
-
-
-# EXAMPLES OF SINGLE PARAMETERS
-
-print("\n=== EXAMPLES ===")
-print("First lensed redshift:", z_lensed[0])
-print("First Einstein radius:", lens_results["r_E"][0])
-print("First reverse redshift:", reverse_z[0])
-print("First reverse distance:", reverse_D[0])
 
 
 # PLOT: Redshift vs Magnification

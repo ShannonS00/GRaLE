@@ -88,36 +88,28 @@ from grale import GWEvent, LensingCalculator
 from astropy.cosmology import FlatLambdaCDM
 import astropy.units as u
 
-# Setup cosmology
+# SETUP
 cosmo = FlatLambdaCDM(H0=67.9, Om0=0.3065)
-
-# Input parameters
-observed_M0 = 1.186  # Observed chirp mass
+z_lens = 0.0098
 distance_mu1 = 40 * u.Mpc
 
-# Create GW event object
-event = GWEvent(m1=1.5, m2=1.3, M0=observed_M0)
+# STEP 1: Create GWEvent with one m1, m2 pair (required)
+event = GWEvent(m1=1.1, m2=1.5)
+
+# Calculate chirp mass
 chirp_mass = event.chirp_mass()
-z_true = event.true_redshift()
+print(f"Chirp Mass: {chirp_mass:.3f} M_sun")
 
-# Setup lensing calculator
-lens = LensingCalculator(
-    cosmo=cosmo,
-    D_mu1=distance_mu1,
-    sigma=160,               # km/s
-    theta_offset=10.07       # arcseconds
-)
+# Get M0 :
+event.M0 
 
-# Calculate distance and lensing parameters
-D_true = lens.luminosity_distance(z_true)
-mu = lens.magnification(D_true)
 
-D_LS = lens.comoving_distance_diff(z_source=z_true, z_lens=0.0098)
-DS = lens.angular_diameter_distance(z_true)
-r_E = lens.einstein_radius(DLS=D_LS, DS=DS)
-mag_power = lens.magnifying_power(einstein_radius=r_E)
+# Get redshift results over those mass ranges 
+# Delta is the mass difference 
+redshift_results = event.redshift_range(delta=0.5, step=0.01, z_lens=z_lens) 
+
+z_lensed = redshift_results["plausible_redshifts_lensed"] #get an array of redshifts for later use
 ```
-
 ---
 
 ##  License

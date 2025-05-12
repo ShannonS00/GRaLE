@@ -290,5 +290,3 @@ class LensingCalculator:
         print(f"Reverse calc distance range: [{d_min:.2f}, {d_max:.2f}] Mpc")
 
         return reverse_redshifts, reverse_distances
-    
-    

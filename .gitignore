@@ -183,3 +183,5 @@ __pycache__/
 
 # VSCode settings (optional)
 .vscode/
+
+docs/build/

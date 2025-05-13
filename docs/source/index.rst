@@ -1,12 +1,7 @@
-.. GRaLE documentation master file, created by
-   sphinx-quickstart on Mon May 12 21:21:13 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 GRaLE documentation
 ===================
 
-Welcome to the documentation of My Project!
+GRaLE is a Python package for analyzing gravitational lensing and gravitational wave events.
 
 .. toctree::
    :maxdepth: 2

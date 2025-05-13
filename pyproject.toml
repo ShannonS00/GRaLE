@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grale"
+version = "0.1.0"
+description = "Gravitational lensing and GW event analysis tools"
+authors = [
+    {name = "Shannon Schroeder", email = "your@email.com"}
+]
+dependencies = [
+    "numpy>=1.21",
+    "astropy>=5.0"
+]
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/ShannonS00/GRaLE"

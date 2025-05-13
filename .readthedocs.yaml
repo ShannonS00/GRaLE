@@ -1,8 +1,12 @@
 version: 2
 
+# Path to your Sphinx configuration file
 sphinx:
   configuration: docs/source/conf.py
 
+# Python environment setup
 python:
   install:
+    - method: pip
+      path: .          # Install your project (optional if not a package)
     - requirements: requirements.txt

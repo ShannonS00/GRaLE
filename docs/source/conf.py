@@ -7,7 +7,8 @@ sys.path.insert(0, os.path.abspath('../../grale')) # path to file
 project = 'GRaLE'
 copyright = '2025, Shannon Schroeder'
 author = 'Shannon Schroeder'
-release = '0.1.0'
+release = '1.0.0'
+version = '1.0'  
 language = 'en'
 
 

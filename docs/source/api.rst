@@ -1,12 +1,7 @@
 API Reference
 =============
 
-.. autoclass:: core.GWEvent
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: core.LensingCalculator
+.. automodule:: grale.core
    :members:
    :undoc-members:
    :show-inheritance:

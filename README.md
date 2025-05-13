@@ -110,10 +110,10 @@ redshift_results = event.redshift_range(delta=0.5, step=0.01, z_lens=z_lens)
 
 z_lensed = redshift_results["plausible_redshifts_lensed"] #get an array of redshifts for later use
 ```
+
 ---
 ## Link to ReadTheDocs: 
 https://grale.readthedocs.io/en/main/index.html
-
 ---
 
 ##  License

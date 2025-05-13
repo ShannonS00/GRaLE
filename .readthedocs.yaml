@@ -8,5 +8,5 @@ sphinx:
 python:
   install:
     - method: pip
-      path: .          # Install your project (optional if not a package)
+      path: .          
     - requirements: requirements.txt

@@ -8,9 +8,3 @@ GRaLE is a Python package for analyzing gravitational lensing and gravitational 
    :caption: Contents:
 
    api
-
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

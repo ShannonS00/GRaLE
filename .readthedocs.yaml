@@ -5,6 +5,7 @@ build:
   tools:
     python: "3.12"
 
+
 python:
   install:
     - requirements: requirements.txt
@@ -12,14 +13,14 @@ python:
       path: .
 
 
-
-sphinx:
-
 # Path to your Sphinx configuration file
 sphinx:
   configuration: docs/source/conf.py
   fail_on_warning: true
 
+
 formats:
   - pdf
   - epub
+
+

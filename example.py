@@ -16,7 +16,7 @@ event = GWEvent(m1=1.1, m2=1.5)
 chirp_mass = event.chirp_mass()
 print(f"Chirp Mass: {chirp_mass:.3f} M_sun")
 
-# Get M0 :
+# Get M0 also by:
 event.M0 
 
 
@@ -37,6 +37,9 @@ lens = LensingCalculator(
 )
 
 lens_results = lens.compute_over_redshift_range(z_lensed, z_lens=z_lens)
+
+mag = lens_results["mag"]
+print(f"Magnification: {mag:.3f}")
 
 # STEP 3: Reverse-calculate redshift range from magnification
 

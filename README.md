@@ -1,4 +1,7 @@
 # GRaLE Gravitational-wave Lensing Explorer
+
+![IMG_3920](https://github.com/user-attachments/assets/7db4d2e5-758c-4239-9a99-2ed1d19ca4a2)
+
 This package investigates whether gravitational wave events, such as GW170817 may have been gravitationally lensed by a foreground galaxy, by computing lensing-related quantities.
 
 ---
@@ -64,20 +67,20 @@ GRaLE is a pure Python library that works in:
 ###  Main Functionality
 
 **Story 1:**  
-_As an astrophysics student, I want to calculate the true redshift of GW170817 using different combinations of neutron star masses so that I can explore whether lensing might explain the observed chirp mass._
+Will Robinson is lost in Space and needs to get to the origin of a Gravitational Wave Event, therefore he must calculate the true redshift of GW170817 using different combinations of neutron star masses, so he can explore if it was gravitationally lensed.
 
 **Story 2:**  
-_As a researcher, I want to compute the Einstein radius and magnifying power of a potential lensing galaxy, so I can determine whether lensing is physically plausible in the case of GW170817._
+Robot is chasing after Will Robinson and to find him, he has to compute the Einstein radius and magnifying power of a potential lensing galaxy, so He can determine whether lensing is physically plausible in the case of GW170817 and find Will Robinson before he falls into a Wormhole._
 
 ---
 
 ### ⚠ Edge Cases
 
 **Story 3:**  
-_As a user, I want the package to raise warnings or errors when unphysical values (e.g. negative redshifts or infinite magnifications) occur, so that I can avoid incorrect conclusions._
+The Evil DR. Dofenschmirz also wants to catch Will and also calculates the lensing properties, but as he does encounter negative redshifts and infinite magnifications, the package raises a warning or an error, so he might get an advantage.
 
 **Story 4:**  
-_As a user, I want the lensing calculator to handle very small angular offsets and low velocity dispersions without crashing, so I can model weak lensing scenarios reliably._
+As a user, I want the lensing calculator to handle very small angular offsets and low velocity dispersions without crashing, so I can model weak lensing scenarios reliably.
 
 ---
 
@@ -112,7 +115,7 @@ z_lensed = redshift_results["plausible_redshifts_lensed"] #get an array of redsh
 ```
 
 ---
-## Link to ReadTheDocs: 
+## Documentation: 
 https://grale.readthedocs.io/en/main/index.html
 ---
 

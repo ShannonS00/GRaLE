@@ -16,8 +16,6 @@ class GWEvent:
         """
         if m1 <= 0 or m2 <= 0:
             raise ValueError("Masses must be positive.")
-        if m1 > m2:
-            raise ValueError("m1 must be smaller or equal to m2 (m1 ≤ m2).")
         self.m1 = m1
         self.m2 = m2
 
@@ -144,7 +142,7 @@ class LensingCalculator:
         self.c = 3e5  # speed of light in km/s
 
     def luminosity_distance(self, z):
-        """Return luminosity distance (with units) for a given redshift z."""
+        """DS: Return luminosity distance (with units) for a given redshift z."""
 
         return self.cosmo.luminosity_distance(z)
 
@@ -154,11 +152,11 @@ class LensingCalculator:
         return self.cosmo.comoving_distance(z)
 
     def angular_diameter_distance(self, z):
-        """Return angular diameter distance (with units) for a given redshift z."""
+        """DS Return angular diameter distance (with units) for a given redshift z."""
         return self.cosmo.angular_diameter_distance(z)
 
     def angular_diameter_distance_z1z2(self, z1, z2):
-        """Return angular diameter distance between redshift z1 and z2."""
+        """DLS: Return angular diameter distance between redshift z1 and z2."""
         return self.cosmo.angular_diameter_distance_z1z2(z1, z2)
 
     def comoving_distance_diff(self, z_source, z_lens):
@@ -235,12 +233,19 @@ class LensingCalculator:
                 - 'z', 'DS', 'DLS', 'r_E', 'mu_geo'
                 - 'plausible_magnifications': μ_geo for z ≥ z_lens
         """
+
+        d_lum = np.array([self.luminosity_distance(z).value for z in z_array])
         DS = np.array([self.angular_diameter_distance(z).value for z in z_array])
         DLS = np.array([self.angular_diameter_distance_z1z2(z_lens, z).value for z in z_array])
         r_E = np.array([
             self.einstein_radius(dls * u.Mpc, ds * u.Mpc).value
             for dls, ds in zip(DLS, DS)
         ])
+
+        # Magnification of the source
+        mag = np.array([self.magnification(d * u.Mpc) for d in d_lum])
+
+        # Geometric magnification
         mu_geo = np.array([self.magnifying_power(re * u.arcsec) for re in r_E])
 
         # Redshift filters
@@ -251,13 +256,15 @@ class LensingCalculator:
         print(f"z ∈ [{z_array.min():.4f}, {z_array.max():.4f}]")
         print(f"DS range: [{DS.min():.2f}, {DS.max():.2f}] Mpc")
         print(f"DLS range: [{DLS.min():.2f}, {DLS.max():.2f}] Mpc")
+        print(f"Magnification range of source: [{mag.min():.2f}, {mag.max():.2f}]")
         print(f"Einstein radius range: [{r_E.min():.3f}, {r_E.max():.3f}] arcsec")
-        print(f"Magnification range: [{mu_geo.min():.2f}, {mu_geo.max():.2f}]")
+        print(f"Magnification range of lens: [{mu_geo.min():.2f}, {mu_geo.max():.2f}]")
 
         return {
             "z": z_array,
             "DS": DS,
             "DLS": DLS,
+            "Magnification of source": mag,
             "r_E": r_E,
             "mu_geo": mu_geo,
             "plausible_magnifications": plausible_mu

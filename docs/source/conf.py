@@ -3,9 +3,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../..'))
+#sys.path.insert(0, os.path.abspath('../..'))
 
-#sys.path.insert(0, os.path.abspath('../../grale')) # path to file
+sys.path.insert(0, os.path.abspath('../../grale')) # path to file
 
 # Add root dir (or examples dir) so Sphinx/nbsphinx can access notebooks
 #sys.path.insert(0, os.path.abspath('../../Examples'))

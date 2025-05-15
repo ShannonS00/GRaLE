@@ -14,4 +14,4 @@ GRaLE is a Python package for analyzing gravitational lensing and gravitational 
    :maxdepth: 1
    :caption: Tutorials
 
-   /Examples/User_guide.ipynb
+   User_guide.ipynb

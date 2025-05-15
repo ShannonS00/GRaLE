@@ -4,3 +4,5 @@ sphinx-autodoc-typehints>=1.24.0
 numpy>=1.21
 astropy>=5.0
 myst-parser>=0.18.0            # Enables Markdown files with Sphinx
+nbsphinx==0.9.7
+jupyter==1.0.0

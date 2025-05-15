@@ -4,6 +4,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
+  include: 
+    - Examples/
 
 python:
   install:
@@ -12,14 +14,14 @@ python:
       path: .
 
 
-
-sphinx:
-
 # Path to your Sphinx configuration file
 sphinx:
   configuration: docs/source/conf.py
   fail_on_warning: true
 
+
 formats:
   - pdf
   - epub
+
+

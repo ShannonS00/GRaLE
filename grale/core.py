@@ -5,7 +5,7 @@ from astropy.cosmology import z_at_value
 class GWEvent:
     def __init__(self, m1, m2):
         """
-        Initialize a gravitational wave event with component masses m1 and m2.
+        Initialize a gravitational wave event with component masses m1 and m2. Assuming µ = 1. 
 
         Parameters:
             m1 (float): Mass of the lighter compact object (must be > 0).
@@ -50,7 +50,10 @@ class GWEvent:
         Returns:
             float: Estimated redshift (z = M₀ / M - 1).
         """
-        return (self.M0 / M) - 1
+        z = (self.M0 / M) - 1
+        if z < 0:
+            raise Warning("Danger Will Robinson, redshift cannot be negative.")
+        return z
 
     
     def redshift_range(self, 
@@ -117,30 +120,15 @@ class GWEvent:
             "plausible_redshifts_lensed": plausible_lensed
         }
 
-
-
-class LensingCalculator:
-    def __init__(self, cosmo, D_mu1, sigma, theta_offset):
-        """
-        Initialize lensing calculator with observational and lens model parameters.
-
+class calculate_distances:
+    def __init__(self, cosmo, z):
+        self.cosmo = cosmo
+        '''
+        Calculate distances for a given cosmology and redshift.
         Parameters:
             cosmo (Cosmology): Astropy cosmology instance.
-            D_mu1 (Quantity): Observed luminosity distance (with units).
-            sigma (float): Velocity dispersion of lens (in km/s).
-            theta_offset (float): Angular offset between image and lens center (in arcseconds).
-
-        Raises:
-            ValueError: If any parameter is non-positive.
-        """
-        if D_mu1 <= 0 * u.Mpc or sigma <= 0 or theta_offset <= 0:
-            raise ValueError("D_mu1, sigma, and theta_offset must be positive.")
-        self.cosmo = cosmo
-        self.D_mu1 = D_mu1
-        self.sigma = sigma
-        self.theta_offset = theta_offset  # in arcseconds
-        self.c = 3e5  # speed of light in km/s
-
+            z (float): Redshift value. '''
+        
     def luminosity_distance(self, z):
         """DS: Return luminosity distance (with units) for a given redshift z."""
 
@@ -171,6 +159,32 @@ class LensingCalculator:
             Quantity: Distance value in Mpc.
         """
         return (self.comoving_distance(z_source) - self.comoving_distance(z_lens)) / (1 + z_source)
+
+
+
+
+class LensingCalculator:
+    def __init__(self, cosmo, D_mu1, sigma, theta_offset):
+        """
+        Initialize lensing calculator with observational and lens model parameters.
+
+        Parameters:
+            cosmo (Cosmology): Astropy cosmology instance.
+            D_mu1 (Quantity): Observed luminosity distance (with units).
+            sigma (float): Velocity dispersion of lens (in km/s).
+            theta_offset (float): Angular offset between image and lens center (in arcseconds).
+
+        Raises:
+            ValueError: If any parameter is non-positive.
+        """
+        if D_mu1 <= 0 * u.Mpc or sigma <= 0 or theta_offset <= 0:
+            raise ValueError("D_mu1, sigma, and theta_offset must be positive.")
+        self.cosmo = cosmo
+        self.D_mu1 = D_mu1
+        self.sigma = sigma
+        self.theta_offset = theta_offset  # in arcseconds
+        self.c = 3e5  # speed of light in km/s
+
 
     def magnification(self, D_true):
         """
@@ -233,10 +247,15 @@ class LensingCalculator:
                 - 'z', 'DS', 'DLS', 'r_E', 'mu_geo'
                 - 'plausible_magnifications': μ_geo for z ≥ z_lens
         """
+        # Calculate distances
+        dist = calculate_distances(self.cosmo, z_array)
+        d_lum = np.array([dist.luminosity_distance(z).value for z in z_array])
+        DS = np.array([dist.angular_diameter_distance(z).value for z in z_array])
+        DLS = np.array([dist.angular_diameter_distance_z1z2(z_lens, z).value for z in z_array])
 
-        d_lum = np.array([self.luminosity_distance(z).value for z in z_array])
-        DS = np.array([self.angular_diameter_distance(z).value for z in z_array])
-        DLS = np.array([self.angular_diameter_distance_z1z2(z_lens, z).value for z in z_array])
+        #d_lum = np.array([self.luminosity_distance(z).value for z in z_array])
+        #DS = np.array([self.angular_diameter_distance(z).value for z in z_array])
+        #DLS = np.array([self.angular_diameter_distance_z1z2(z_lens, z).value for z in z_array])
         r_E = np.array([
             self.einstein_radius(dls * u.Mpc, ds * u.Mpc).value
             for dls, ds in zip(DLS, DS)
@@ -264,7 +283,7 @@ class LensingCalculator:
             "z": z_array,
             "DS": DS,
             "DLS": DLS,
-            "Magnification of source": mag,
+            "mag": mag,
             "r_E": r_E,
             "mu_geo": mu_geo,
             "plausible_magnifications": plausible_mu

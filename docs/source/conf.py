@@ -31,3 +31,17 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
 html_theme = 'sphinx_rtd_theme'
+
+# Include the static path for custom assets
+html_static_path = ["_static"]
+
+# Set the logo (appears top-left)
+html_logo = "_static/logo.png"
+
+html_context = {
+    "display_github": True,  # Integrate GitHub
+    "github_user": "ShannonS00",     # GitHub username
+    "github_repo": "GRaLE",    # Repository name
+    "github_version": "main",           # Branch
+    "conf_py_path": "/docs/source/",    # Path in repo to your conf.py
+}

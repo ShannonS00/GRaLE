@@ -115,7 +115,7 @@ z_lensed = redshift_results["plausible_redshifts_lensed"] #get an array of redsh
 ```
 
 ---
-## Link to ReadTheDocs: 
+## Documentation: 
 https://grale.readthedocs.io/en/main/index.html
 ---
 

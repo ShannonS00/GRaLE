@@ -1,1 +1,1 @@
-from .core import GWEvent, LensingCalculator
+from .core import GWEvent, calculate_distances, LensingCalculator

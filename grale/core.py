@@ -121,7 +121,7 @@ class GWEvent:
         }
 
 class calculate_distances:
-    def __init__(self, cosmo, z):
+    def __init__(self, cosmo):
         self.cosmo = cosmo
         '''
         Calculate distances for a given cosmology and redshift.
@@ -159,8 +159,6 @@ class calculate_distances:
             Quantity: Distance value in Mpc.
         """
         return (self.comoving_distance(z_source) - self.comoving_distance(z_lens)) / (1 + z_source)
-
-
 
 
 class LensingCalculator:
@@ -248,7 +246,7 @@ class LensingCalculator:
                 - 'plausible_magnifications': μ_geo for z ≥ z_lens
         """
         # Calculate distances
-        dist = calculate_distances(self.cosmo, z_array)
+        dist = calculate_distances(self.cosmo)
         d_lum = np.array([dist.luminosity_distance(z).value for z in z_array])
         DS = np.array([dist.angular_diameter_distance(z).value for z in z_array])
         DLS = np.array([dist.angular_diameter_distance_z1z2(z_lens, z).value for z in z_array])

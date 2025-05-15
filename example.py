@@ -1,4 +1,4 @@
-from grale import GWEvent, LensingCalculator
+from grale import GWEvent, calculate_distances, LensingCalculator
 from astropy.cosmology import FlatLambdaCDM
 import astropy.units as u
 import matplotlib.pyplot as plt
@@ -24,49 +24,8 @@ holy.M0
 # Delta is the mass difference 
 redshift_results = holy.redshift_range(delta=0.5, step=0.01, z_lens=z_lens) 
 
-
-class calculate_distances:
-    def __init__(self, cosmo, z):
-        self.cosmo = cosmo
-        '''
-        Calculate distances for a given cosmology and redshift.
-        Parameters:
-            cosmo (Cosmology): Astropy cosmology instance.
-            z (float): Redshift value. '''
-        
-    def luminosity_distance(self, z):
-        """DS: Return luminosity distance (with units) for a given redshift z."""
-
-        return self.cosmo.luminosity_distance(z)
-
-    def comoving_distance(self, z):
-        """Return comoving distance (with units) for a given redshift z."""
-
-        return self.cosmo.comoving_distance(z)
-
-    def angular_diameter_distance(self, z):
-        """DS Return angular diameter distance (with units) for a given redshift z."""
-        return self.cosmo.angular_diameter_distance(z)
-
-    def angular_diameter_distance_z1z2(self, z1, z2):
-        """DLS: Return angular diameter distance between redshift z1 and z2."""
-        return self.cosmo.angular_diameter_distance_z1z2(z1, z2)
-
-    def comoving_distance_diff(self, z_source, z_lens):
-        """
-        Compute (D_C(z_source) - D_C(z_lens)) / (1 + z_source).
-
-        Parameters:
-            z_source (float): Source redshift.
-            z_lens (float): Lens redshift.
-
-        Returns:
-            Quantity: Distance value in Mpc.
-        """
-        return (self.comoving_distance(z_source) - self.comoving_distance(z_lens)) / (1 + z_source)
-
 # Setup the distance calculator
-dist = calculate_distances(cosmo, z_lens)
+dist = calculate_distances(cosmo = cosmo)
 
 # Calculate luminosity distance
 dlum = dist.luminosity_distance(z_lens)

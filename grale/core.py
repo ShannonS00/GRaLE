@@ -103,6 +103,7 @@ class GWEvent:
         print(f"m2 ∈ [{m2_range.min():.2f}, {m2_range.max():.2f}]")
         print(f"Chirp mass range: [{chirp_masses.min():.2f}, {chirp_masses.max():.2f}]")
         print(f"Plausible redshift range: [{plausible.min():.4f}, {plausible.max():.4f}]")
+        print(f'Plausible redshift range (lensed): [{plausible_lensed.min():.4f}, {plausible_lensed.max():.4f}]' if z_lens is not None else "No lensed redshift range provided.")
 
         if z_lens is not None and len(plausible_lensed) > 0:
             print(f"Lensed redshift range (z ≥ {z_lens}): "
@@ -264,7 +265,7 @@ class LensingCalculator:
             "z": z_array,
             "DS": DS,
             "DLS": DLS,
-            "Magnification of source": mag,
+            "Mag": mag,
             "r_E": r_E,
             "mu_geo": mu_geo,
             "plausible_magnifications": plausible_mu

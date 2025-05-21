@@ -22,11 +22,18 @@ event.M0
 
 # Get redshift results over those mass ranges 
 # Delta is the mass difference 
+print('-------------------------')
+# STEP 1: Calculate source quantities
 redshift_results = event.redshift_range(delta=0.5, step=0.01, z_lens=z_lens) 
 
 z_lensed = redshift_results["plausible_redshifts_lensed"] #get an array of redshifts for later use 
 
+print('-------------------------')
 
+# Vary m2 only, keep m1 fixed 
+result = event.redshift_range(delta=0.5, step=0.01, z_lens=z_lens, m1_range=np.array([1.1]))
+
+print('--------------------------')
 # STEP 2: Compute lensing quantities
 
 lens = LensingCalculator(
@@ -37,9 +44,7 @@ lens = LensingCalculator(
 )
 
 lens_results = lens.compute_over_redshift_range(z_lensed, z_lens=z_lens)
-
-mag = lens_results["mag"]
-print(f"Magnification: {mag:.3f}")
+print('-------------------------')
 
 # STEP 3: Reverse-calculate redshift range from magnification
 

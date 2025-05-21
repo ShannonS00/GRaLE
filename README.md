@@ -10,8 +10,8 @@ This package investigates whether gravitational wave events, such as GW170817 ma
 
 - Python 3.8+
 - numpy
-- matplotlib
 - astropy
+- scipy 
 
 ---
 

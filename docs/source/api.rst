@@ -1,5 +1,5 @@
 Grale Documentation
-=============
+===================
 
 .. automodule:: grale.core
    :members:

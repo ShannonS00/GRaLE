@@ -4,6 +4,7 @@ GRaLE documentation
 Date: May 21, 2025 Version: 1.0
 
 Github: https://github.com/ShannonS00/GRaLE
+
 GRaLE is a Python package for analyzing gravitational lensing and gravitational wave events, such as GW170817
 
 .. toctree::
